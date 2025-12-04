@@ -92,14 +92,36 @@ default_drop = adjust_time(default_pickup + timedelta(days=1))
 car_type = st.selectbox("Select Car Type", list(FLEET_PRICES.keys()))
 plan_type = st.selectbox("Select Plan Type", list(FLEET_PRICES[car_type].keys()))
 
-pickup_date = st.date_input("Pickup Date", value=default_pickup.date())
-pickup_hour = st.number_input("Pickup Hour (0-23)", min_value=MIN_HOUR, max_value=MAX_HOUR, value=default_pickup.hour)
+# Pickup & Drop side by side (date + hour together)
+col1, col2 = st.columns(2)
 
-drop_date = st.date_input("Drop Date", value=default_drop.date())
-drop_hour = st.number_input("Drop Hour (0-23)", min_value=MIN_HOUR, max_value=MAX_HOUR, value=default_drop.hour)
+with col1:
+    st.write("### Pickup")
+    pcol1, pcol2 = st.columns([2,1])
+    with pcol1:
+        pickup_date = st.date_input("Date", value=default_pickup.date(), key="pickup_date")
+    with pcol2:
+        pickup_hour = st.number_input("Hour", min_value=MIN_HOUR, max_value=MAX_HOUR, value=default_pickup.hour, key="pickup_hour")
+
+with col2:
+    st.write("### Drop")
+    dcol1, dcol2 = st.columns([2,1])
+    with dcol1:
+        drop_date = st.date_input("Date", value=default_drop.date(), key="drop_date")
+    with dcol2:
+        drop_hour = st.number_input("Hour", min_value=MIN_HOUR, max_value=MAX_HOUR, value=default_drop.hour, key="drop_hour")
 
 pickup_dt = datetime.combine(pickup_date, time(pickup_hour))
 drop_dt = datetime.combine(drop_date, time(drop_hour))
+
+# Show total duration
+if drop_dt > pickup_dt:
+    total_hours = (drop_dt - pickup_dt).total_seconds() / 3600
+    total_days = total_hours / 24
+    st.write(f"**Total Duration:** {total_hours:.1f} hours ({total_days:.1f} days)")
+else:
+    st.warning("Drop time must be after pickup time.")
+
 
 # -------------------------------
 # Validation

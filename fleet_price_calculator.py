@@ -122,7 +122,6 @@ if drop_dt > pickup_dt:
 else:
     st.warning("Drop time must be after pickup time.")
 
-
 # -------------------------------
 # Validation
 # -------------------------------
@@ -173,6 +172,9 @@ else:
                 st.warning("⚠️ Minimum subtotal ₹20000 required for 25% offer")
         elif discount_choice == "Other":
             discount_value = float(st.number_input("Enter custom discount (₹)", min_value=0, value=0))
+
+        # Cap discount at ₹10,000
+        discount_value = min(discount_value, 10000.0)
         discount_value = round(discount_value, 2)
 
         discounted_price = round(subtotal_before_discount - discount_value, 2)
